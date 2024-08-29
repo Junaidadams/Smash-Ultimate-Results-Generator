@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { characterList } from "../../constants";
 import PropTypes from "prop-types";
+import axios from "axios";
 
 const Top8Form = ({ onSubmit }) => {
   const [eventName, setEventName] = useState("");
-
   const [date, setDate] = useState("");
   const [playerData, setPlayerData] = useState({
     player1: { character: 0, skin: 0, name: "", prefix: "", placement: "1st" },
@@ -17,66 +17,7 @@ const Top8Form = ({ onSubmit }) => {
     player8: { character: 0, skin: 0, name: "", prefix: "", placement: "8th" },
   });
 
-  const handleAutofillTest = () => {
-    setPlayerData({
-      player1: {
-        character: "12",
-        skin: 0,
-        name: "Jeff",
-        prefix: "Naut",
-        placement: "1st",
-      },
-      player2: {
-        character: "13",
-        skin: 0,
-        name: "Jeff",
-        prefix: "Naut",
-        placement: "2nd",
-      },
-      player3: {
-        character: "13",
-        skin: 0,
-        name: "Jeff",
-        prefix: "Naut",
-        placement: "3rd",
-      },
-      player4: {
-        character: "18",
-        skin: 0,
-        name: "Jeff",
-        prefix: "Naut",
-        placement: "4th",
-      },
-      player5: {
-        character: "16",
-        skin: 0,
-        name: "Jeff",
-        prefix: "Naut",
-        placement: "5th",
-      },
-      player6: {
-        character: "15",
-        skin: 0,
-        name: "FFFF",
-        prefix: "Naut",
-        placement: "6th",
-      },
-      player7: {
-        character: "16",
-        skin: 0,
-        name: "fdfd",
-        prefix: "dsds",
-        placement: "7th",
-      },
-      player8: {
-        character: "15",
-        skin: 0,
-        name: "dsds",
-        prefix: "sd",
-        placement: "8th",
-      },
-    });
-  };
+  const [eventLink, setEventLink] = useState("");
 
   const handlePlayerChange = (playerKey, field, value) => {
     setPlayerData((prevPlayerData) => ({
@@ -95,13 +36,73 @@ const Top8Form = ({ onSubmit }) => {
     return character ? character.images[0] : { icons: [], displayImages: [] };
   };
 
+  const fetchEventData = async (url) => {
+    const eventSlug = extractEventSlug(url);
+    if (eventSlug) {
+      try {
+        // Fetch event data and standings from the combined backend endpoint
+        const response = await axios.post(
+          "http://localhost:3000/api/event-data",
+          {
+            slug: eventSlug,
+            page: 1, // Adjust as needed
+            perPage: 8, // Adjust as needed
+          }
+        );
+
+        const eventData = response.data.data;
+        const { name, standings } = eventData.event;
+
+        // Map the standings to player data
+        const updatedPlayerData = {};
+        standings.nodes.forEach((stand, index) => {
+          if (index < 8) {
+            updatedPlayerData[`player${index + 1}`] = {
+              ...playerData[`player${index + 1}`],
+              name: stand.entrant.name,
+              placement: `${stand.placement}${getPlacementSuffix(
+                stand.placement
+              )}`,
+            };
+          }
+        });
+
+        setEventName(name || "");
+        setDate(""); // Set the date if it's available
+        setPlayerData(updatedPlayerData);
+      } catch (error) {
+        console.error("Error fetching event data:", error);
+      }
+    }
+  };
+
+  // Function to extract the slug from the URL
+  const extractEventSlug = (url) => {
+    const match = url.match(/tournament\/([a-z0-9-]+)/);
+    console.log(match);
+    return match ? match[1] : null;
+  };
+
+  const getPlacementSuffix = (placement) => {
+    switch (placement) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({ eventName, date, playerData });
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`space-y-6 p-8 `}>
+    <form onSubmit={handleSubmit} className={`space-y-6 p-8`}>
       <div className="flex flex-col 2xl:flex-row">
         <div className="flex flex-col w-full p-2">
           <label htmlFor="eventName" className="text-lg font-semibold">
@@ -133,21 +134,43 @@ const Top8Form = ({ onSubmit }) => {
         </div>
       </div>
 
+      {/* Event Link Input */}
+      <div className="flex flex-col w-full p-2">
+        <label htmlFor="eventLink" className="text-lg font-semibold">
+          Event Link:
+        </label>
+        <input
+          id="eventLink"
+          name="eventLink"
+          type="text"
+          value={eventLink}
+          onChange={(e) => setEventLink(e.target.value)}
+          className="border border-gray-300 rounded-md p-2"
+        />
+        <button
+          type="button"
+          onClick={() => fetchEventData(eventLink)}
+          className="mt-2 bg-blue-500 text-white rounded-md py-2 px-4 hover:bg-blue-600"
+        >
+          Fetch Event Data
+        </button>
+      </div>
+
       <div className="flex flex-col 2xl:grid 2xl:grid-cols-2">
         {Object.keys(playerData).map((playerKey, index) => {
           const player = playerData[playerKey];
           const { icons, displayImages } = getCharacterDetails(
             player.character
           );
-          const currentImage = displayImages[player.skin] || displayImages[0]; // Default to the first display image if no skin selected
+          const currentImage = displayImages[player.skin] || displayImages[0];
           return (
             <div
               key={playerKey}
-              className="flex flex-col space-y-2 bg-slate-300 rounded-2xl p-6 m-2"
+              className="flex flex-col space-y-2 bg-slate-300 rounded-sm p-6 m-2"
             >
               <label
                 htmlFor={"playerName" + index + 1}
-                className="text-lg  font-semibold"
+                className="text-lg font-semibold"
               >
                 Player {index + 1} Name:
               </label>
@@ -164,7 +187,7 @@ const Top8Form = ({ onSubmit }) => {
               />
               <label
                 htmlFor={"prefix" + index + 1}
-                className="text-lg  font-semibold"
+                className="text-lg font-semibold"
               >
                 Prefix:
               </label>
@@ -209,7 +232,7 @@ const Top8Form = ({ onSubmit }) => {
                         key={skinIndex}
                         className={`cursor-pointer m-2 2xl:m-1 border rounded-md p-1 ${
                           player.skin === skinIndex
-                            ? "border-blue-500"
+                            ? "border-slate-800 bg-slate-400"
                             : "border-gray-300"
                         }`}
                         onClick={() =>
@@ -241,13 +264,6 @@ const Top8Form = ({ onSubmit }) => {
         className="bg-blue-500 text-white rounded-md py-2 px-4 hover:bg-blue-600"
       >
         Generate Graphic
-      </button>
-      <button
-        onClick={handleAutofillTest}
-        type="button"
-        className="bg-blue-500 text-white rounded-md py-2 px-4 hover:bg-blue-600"
-      >
-        Autofill{" "}
       </button>
     </form>
   );

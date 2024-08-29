@@ -1,5 +1,10 @@
 import { characterImages } from "./src/utils/characterImages";
 
+import blackTexture1 from "./src/assets/backgrounds/blacktexture1.png";
+import blackTexture2 from "./src/assets/backgrounds/blacktexture2.png";
+
+export const bgList = [{ Black: [blackTexture1, blackTexture2] }];
+
 export const characterList = [
   {
     key: 1,
