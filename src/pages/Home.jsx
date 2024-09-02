@@ -1,51 +1,33 @@
 import Top8Display from "../components/Top8Display";
 import Top8Form from "../components/Top8Form";
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
 
 const Home = () => {
   const [submittedData, setSubmittedData] = useState(null);
-  const [toggle, setToggle] = useState(true);
 
   const handleFormSubmit = (data) => {
     setSubmittedData(data);
-    handleToggle(false);
   };
-  const handleToggle = (newState) => {
-    setToggle(newState);
-  };
+
   return (
-    <main className="bg-gradient-to-r  min-w-screen min-h-screen bg-white z-0">
-      <section className="w-full bg-slate-50 sm:w-2/3 md:w-1/2 mx-auto">
-        <div className="px-8 pt-8">
-          <h1 className="text-3xl font-bold">Top 8 Result Generator</h1>
-          <p className="py-4">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque
-            minima quasi cum laboriosam magnam at aut aspernatur laborum fugiat.
-            Tempore earum necessitatibus vitae aliquam tenetur consequatur fuga
-            optio, dignissimos sunt.
+    <main className="min-w-screen min-h-screen bg-gradient-to-b from-[#E8F5E9] to-[#F5FBEF] z-0 flex items-center justify-center">
+      <section className="w-full bg-[#fcfcfc] sm:w-2/3 md:w-1/2 2xl:w-3/5 mx-auto min-h-screen shadow-2xl rounded-lg overflow-hidden">
+        <div className="px-8 pt-8 lg:px-16 flex flex-col">
+          <h1 className="text-5xl p-4 font-extrabold text-[#2c3441]">
+            Top 8 Result Generator
+          </h1>
+          <p className="p-4 text-lg text-[#4B5563] font-medium">
+            Generate sleek and professional Top 8 results for your event.
           </p>
-          {toggle ? (
-            <button
-              className="bg-slate-300 rounded-2xl px-4"
-              onClick={() => handleToggle(false)}
-            >
-              <ChevronUp color="black" />
-            </button>
-          ) : (
-            <button
-              className="bg-slate-300 rounded-2xl px-4"
-              onClick={() => handleToggle(true)}
-            >
-              <ChevronDown color="black" />
-            </button>
-          )}
         </div>
 
-        <div className={`${!toggle && "hidden"}`}>
+        <div
+          className={`
+          } p-8 lg:p-16 transition-all duration-300`}
+        >
           <Top8Form onSubmit={handleFormSubmit} />
         </div>
-        <div className=" max-w-full max-h-full">
+        <div className="max-w-full max-h-full p-8 lg:p-16">
           {submittedData ? (
             <Top8Display
               eventName={submittedData.eventName}
@@ -53,7 +35,7 @@ const Home = () => {
               playerData={submittedData.playerData}
             />
           ) : (
-            <p>No data submitted yet</p> // Optional: Add a placeholder when no data is submitted
+            <p className="text-center text-gray-500">No data submitted yet</p>
           )}
         </div>
       </section>

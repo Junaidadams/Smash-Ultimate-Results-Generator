@@ -2,10 +2,12 @@ import { useState } from "react";
 import { characterList } from "../../constants";
 import PropTypes from "prop-types";
 import axios from "axios";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const Top8Form = ({ onSubmit }) => {
   const [eventName, setEventName] = useState("");
   const [date, setDate] = useState("");
+  const [toggle, setToggle] = useState(true);
   const [playerData, setPlayerData] = useState({
     player1: { character: 0, skin: 0, name: "", prefix: "", placement: "1st" },
     player2: { character: 0, skin: 0, name: "", prefix: "", placement: "2nd" },
@@ -19,17 +21,28 @@ const Top8Form = ({ onSubmit }) => {
 
   const [eventLink, setEventLink] = useState("");
 
+  const handleToggle = (newState) => {
+    setToggle(newState);
+  };
+
   const handlePlayerChange = (playerKey, field, value) => {
     setPlayerData((prevPlayerData) => ({
       ...prevPlayerData,
       [playerKey]: {
         ...prevPlayerData[playerKey],
-        [field]: value,
+        [field]: field === "character" ? Number(value) : value, // Ensure value is a number for character
       },
     }));
   };
 
   const getCharacterDetails = (characterKey) => {
+    if (characterKey === 0) {
+      return {
+        icons: [],
+        displayImages: ["../assets/characters/nochar.png"],
+      };
+    }
+
     const character = characterList.find(
       (character) => character.key === Number(characterKey)
     );
@@ -37,49 +50,74 @@ const Top8Form = ({ onSubmit }) => {
   };
 
   const fetchEventData = async (url) => {
-    const eventSlug = extractEventSlug(url);
+    const eventSlug = "tournament/" + extractEventSlug(url);
+
     if (eventSlug) {
       try {
-        // Fetch event data and standings from the combined backend endpoint
+        // Fetch event data and standings with character details from the combined backend endpoint
         const response = await axios.post(
           "http://localhost:3000/api/event-data",
           {
             slug: eventSlug,
-            page: 1, // Adjust as needed
-            perPage: 8, // Adjust as needed
+            page: 1,
+            perPage: 8,
           }
         );
 
-        const eventData = response.data.data;
-        const { name, standings } = eventData.event;
+        const eventData = response.data.event; // Use 'event' directly as per the combined response structure
+        console.log(eventData);
+        const { name, standings } = eventData;
+
+        if (!standings || !standings.nodes || !Array.isArray(standings.nodes)) {
+          throw new Error("Standings data is missing or not an array");
+        }
 
         // Map the standings to player data
-        const updatedPlayerData = {};
-        standings.nodes.forEach((stand, index) => {
-          if (index < 8) {
-            updatedPlayerData[`player${index + 1}`] = {
-              ...playerData[`player${index + 1}`],
-              name: stand.entrant.name,
+        const updatedPlayerData = standings.nodes.reduce(
+          (acc, stand, index) => {
+            if (!stand.entrant) {
+              console.warn(`Entrant data is missing for index ${index}`);
+              return acc;
+            }
+
+            const playerName = stand.entrant.name;
+            const [prefix, name] = playerName.includes("|")
+              ? playerName.split("|").map((part) => part.trim())
+              : ["", playerName.trim()];
+
+            acc[`player${index + 1}`] = {
+              name,
+              prefix,
               placement: `${stand.placement}${getPlacementSuffix(
                 stand.placement
               )}`,
+              character: stand.entrant.character || {
+                id: 0,
+                name: "",
+                images: { icons: [], displayImages: [] },
+              },
             };
-          }
-        });
+
+            return acc;
+          },
+          {}
+        );
 
         setEventName(name || "");
         setDate(""); // Set the date if it's available
         setPlayerData(updatedPlayerData);
+        handleToggle();
+        console.log(updatedPlayerData);
       } catch (error) {
         console.error("Error fetching event data:", error);
       }
     }
   };
 
-  // Function to extract the slug from the URL
+  // Function to extract the full event slug from the URL
   const extractEventSlug = (url) => {
-    const match = url.match(/tournament\/([a-z0-9-]+)/);
-    console.log(match);
+    const match = url.match(/tournament\/([^/]+\/event\/[^/]+)/);
+    // console.log(match);
     return match ? match[1] : null;
   };
 
@@ -102,169 +140,208 @@ const Top8Form = ({ onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`space-y-6 p-8`}>
-      <div className="flex flex-col 2xl:flex-row">
-        <div className="flex flex-col w-full p-2">
-          <label htmlFor="eventName" className="text-lg font-semibold">
-            Tournament Name:
-          </label>
-          <input
-            id="eventName"
-            name="eventName"
-            type="text"
-            value={eventName}
-            onChange={(e) => setEventName(e.target.value)}
-            className="border border-gray-300 rounded-md p-2"
-            required
-          />
-        </div>
-        <div className="flex flex-col w-full p-2">
-          <label htmlFor="date" className="text-lg font-semibold">
-            Date:
-          </label>
-          <input
-            required
-            id="date"
-            name="date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="border border-gray-300 rounded-md p-2"
-          />
-        </div>
-      </div>
-
-      {/* Event Link Input */}
-      <div className="flex flex-col w-full p-2">
-        <label htmlFor="eventLink" className="text-lg font-semibold">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="flex flex-col w-full p-4">
+        <label
+          htmlFor="eventLink"
+          className="text-lg font-semibold text-slate-700"
+        >
           Event Link:
         </label>
+        <p>
+          Format:
+          https://www.start.gg/tournament/genesis-9-1/event/ultimate-singles
+        </p>
         <input
           id="eventLink"
           name="eventLink"
           type="text"
           value={eventLink}
           onChange={(e) => setEventLink(e.target.value)}
-          className="border border-gray-300 rounded-md p-2"
+          className="border border-gray-300 rounded-md p-2 focus:border-gray-400 focus:outline-none"
         />
         <button
           type="button"
           onClick={() => fetchEventData(eventLink)}
-          className="mt-2 bg-blue-500 text-white rounded-md py-2 px-4 hover:bg-blue-600"
+          className="mt-6 bg-[#719145] text-white rounded-sm py-2 px-4 hover:bg-[#86a161] focus:border-gray-400"
         >
           Fetch Event Data
         </button>
+        {toggle ? (
+          <button
+            className="bg-gray-30 mx-auto w-fit rounded-2xl my-4 px-4 py-2 hover:bg-gray-40 transition"
+            onClick={() => handleToggle(false)}
+          >
+            <ChevronUp color="black" />
+          </button>
+        ) : (
+          <button
+            className="bg-gray-30 mx-auto w-fit rounded-2xl my-4 px-4 py-2 hover:bg-gray-40 transition"
+            onClick={() => handleToggle(true)}
+          >
+            <ChevronDown color="black" />
+          </button>
+        )}
       </div>
-
-      <div className="flex flex-col 2xl:grid 2xl:grid-cols-2">
-        {Object.keys(playerData).map((playerKey, index) => {
-          const player = playerData[playerKey];
-          const { icons, displayImages } = getCharacterDetails(
-            player.character
-          );
-          const currentImage = displayImages[player.skin] || displayImages[0];
-          return (
-            <div
-              key={playerKey}
-              className="flex flex-col space-y-2 bg-slate-300 rounded-sm p-6 m-2"
+      <div className={`${toggle && "hidden"}`}>
+        <div className=" flex flex-col 2xl:flex-row">
+          <div className="flex flex-col w-full p-4">
+            <label
+              htmlFor="eventName"
+              className="text-lg font-semibold text-slate-700"
             >
-              <label
-                htmlFor={"playerName" + index + 1}
-                className="text-lg font-semibold"
+              Tournament Name:
+            </label>
+            <input
+              id="eventName"
+              name="eventName"
+              type="text"
+              value={eventName}
+              onChange={(e) => setEventName(e.target.value)}
+              className="border border-gray-300 rounded-md p-2 focus:border-gray-400 focus:outline-none"
+              required
+            />
+          </div>
+          <div className="flex flex-col w-full p-4">
+            <label
+              htmlFor="date"
+              className="text-lg font-semibold text-slate-700"
+            >
+              Date:
+            </label>
+            <input
+              required
+              id="date"
+              name="date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="border border-gray-300 rounded-md p-2 focus:border-gray-400 focus:outline-none"
+            />
+          </div>
+        </div>
+        <div className="flex flex-col 2xl:grid 2xl:grid-cols-2">
+          {Object.keys(playerData).map((playerKey, index) => {
+            const player = playerData[playerKey];
+            const { icons, displayImages } = getCharacterDetails(
+              player.character
+            );
+            const currentImage =
+              displayImages[player.skin] ||
+              displayImages[0] ||
+              "../assets/characters/nochar.png";
+            return (
+              <div
+                key={playerKey}
+                className="flex flex-col space-y-2 bg-[#D4DFC7] shadow-2xl rounded-lg p-6 m-4"
               >
-                Player {index + 1} Name:
-              </label>
-              <input
-                required
-                id={"playerName" + index + 1}
-                name={"playerName" + index + 1}
-                type="text"
-                value={player.name}
-                onChange={(e) =>
-                  handlePlayerChange(playerKey, "name", e.target.value)
-                }
-                className="border border-gray-300 rounded-md p-2"
-              />
-              <label
-                htmlFor={"prefix" + index + 1}
-                className="text-lg font-semibold"
-              >
-                Prefix:
-              </label>
-              <input
-                required
-                id={"prefix" + index + 1}
-                name={"prefix" + index + 1}
-                type="text"
-                value={player.prefix}
-                onChange={(e) =>
-                  handlePlayerChange(playerKey, "prefix", e.target.value)
-                }
-                className="border border-gray-300 rounded-md p-2"
-              />
-              <label
-                htmlFor={"character" + index + 1}
-                className="text-lg font-semibold"
-              >
-                Character:
-              </label>
-              <select
-                required
-                id={"character" + index + 1}
-                name={"character" + index + 1}
-                value={player.character}
-                onChange={(e) =>
-                  handlePlayerChange(playerKey, "character", e.target.value)
-                }
-                className="border border-gray-300 rounded-md p-2"
-              >
-                {characterList.map((character) => (
-                  <option key={character.key} value={character.key}>
-                    {character.name}
-                  </option>
-                ))}
-              </select>
-              {player.character !== 0 && (
-                <>
-                  <div className="grid grid-cols-4 lg:grid-cols-8 mt-2">
-                    {icons.map((icon, skinIndex) => (
-                      <div
-                        key={skinIndex}
-                        className={`cursor-pointer m-2 2xl:m-1 border rounded-md p-1 ${
-                          player.skin === skinIndex
-                            ? "border-slate-800 bg-slate-400"
-                            : "border-gray-300"
-                        }`}
-                        onClick={() =>
-                          handlePlayerChange(playerKey, "skin", skinIndex)
-                        }
-                      >
-                        <img
-                          src={icon}
-                          alt={`Icon ${skinIndex}`}
-                          className="w-12 h-12 2xl:w-8 2xl:h-8 object-cover m-auto"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <img
-                    src={currentImage}
-                    alt="Selected Character"
-                    className="w-40 h-40 rounded-full mx-auto object-cover mt-2"
-                  />
-                </>
-              )}
-            </div>
-          );
-        })}
+                <label
+                  htmlFor={"playerName" + index + 1}
+                  className="text-lg font-semibold text-slate-800"
+                >
+                  Player {index + 1} Name:
+                </label>
+                <input
+                  required
+                  id={"playerName" + index + 1}
+                  name={"playerName" + index + 1}
+                  type="text"
+                  value={player.name}
+                  onChange={(e) =>
+                    handlePlayerChange(playerKey, "name", e.target.value)
+                  }
+                  className="border border-gray-300 rounded-md p-2  focus:border-gray-400 focus:outline-none"
+                />
+                <label
+                  htmlFor={"prefix" + index + 1}
+                  className="text-lg font-semibold text-slate-800"
+                >
+                  Prefix:
+                </label>
+                <input
+                  id={"prefix" + index + 1}
+                  name={"prefix" + index + 1}
+                  type="text"
+                  value={player.prefix}
+                  onChange={(e) =>
+                    handlePlayerChange(playerKey, "prefix", e.target.value)
+                  }
+                  className="border border-gray-300 rounded-md p-2  focus:border-gray-400 focus:outline-none"
+                />
+                <label
+                  htmlFor={"character" + index + 1}
+                  className="text-lg font-semibold text-slate-800"
+                >
+                  Character:
+                </label>
+                <select
+                  required
+                  id={"character" + index + 1}
+                  name={"character" + index + 1}
+                  value={player.character}
+                  onChange={(e) =>
+                    handlePlayerChange(playerKey, "character", e.target.value)
+                  }
+                  className="border border-gray-300 rounded-md p-2  focus:border-gray-400 focus:outline-none"
+                >
+                  <option value={0}>-- Select --</option>
+                  {characterList.map((character) => (
+                    <option
+                      key={character.key}
+                      value={character.key}
+                      className=""
+                    >
+                      {character.name}
+                    </option>
+                  ))}
+                </select>
+                {player.character !== 0 && (
+                  <>
+                    <div className="grid grid-cols-4 lg:grid-cols-8 mt-2">
+                      {icons.map((icon, skinIndex) => (
+                        <div
+                          key={skinIndex}
+                          className={`cursor-pointer m-2 2xl:m-1 border rounded-md p-1 ${
+                            player.skin === skinIndex
+                              ? "border-slate-800 bg-slate-400"
+                              : "border-gray-300"
+                          }`}
+                          onClick={() =>
+                            handlePlayerChange(playerKey, "skin", skinIndex)
+                          }
+                        >
+                          <img
+                            src={icon}
+                            alt={`Icon ${skinIndex}`}
+                            className="w-12 h-12 2xl:w-8 2xl:h-8 object-cover m-auto"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <img
+                      src={
+                        !currentImage
+                          ? "../assets/characters/nochar.png"
+                          : currentImage
+                      }
+                      alt="Selected Character"
+                      className="w-40 h-40 rounded-full mx-auto object-cover mt-2"
+                    />
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex flex-col w-full p-4">
+          <button
+            type="submit"
+            className="mt-6 bg-[#719145] text-white rounded-sm py-2 px-4 hover:bg-[#86a161] focus:border-gray-400"
+          >
+            Generate Graphic
+          </button>
+        </div>
       </div>
-
-      <button
-        type="submit"
-        className="bg-blue-500 text-white rounded-md py-2 px-4 hover:bg-blue-600"
-      >
-        Generate Graphic
-      </button>
     </form>
   );
 };
