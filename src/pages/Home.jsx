@@ -25,7 +25,7 @@ const Home = () => {
           </p>
         </div>
 
-        <div>
+        <div className="">
           <Top8Form onSubmit={handleFormSubmit} />
         </div>
         <div className="max-w-full max-h-full p-8 lg:p-16">

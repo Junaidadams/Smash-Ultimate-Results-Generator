@@ -191,7 +191,7 @@ const Top8Form = ({ onSubmit }) => {
           </button>
         )}
       </div>
-      <div className={`${toggle && "hidden"}`}>
+      <div className={`${toggle && "hidden"} px-8 lg:px-16`}>
         <div className=" flex flex-col 2xl:flex-row">
           <div className="flex flex-col w-full p-4">
             <label
@@ -249,33 +249,35 @@ const Top8Form = ({ onSubmit }) => {
                 >
                   Player {index + 1} Name:
                 </label>
-                <input
-                  required
-                  id={"playerName" + index + 1}
-                  name={"playerName" + index + 1}
-                  type="text"
-                  value={player.name}
-                  onChange={(e) =>
-                    handlePlayerChange(playerKey, "name", e.target.value)
-                  }
-                  className="border border-gray-300 rounded-md p-2  focus:border-gray-400 focus:outline-none"
-                />
-                <label
-                  htmlFor={"prefix" + index + 1}
-                  className="text-lg font-semibold text-slate-800"
-                >
-                  Prefix:
-                </label>
-                <input
-                  id={"prefix" + index + 1}
-                  name={"prefix" + index + 1}
-                  type="text"
-                  value={player.prefix}
-                  onChange={(e) =>
-                    handlePlayerChange(playerKey, "prefix", e.target.value)
-                  }
-                  className="border border-gray-300 rounded-md p-2  focus:border-gray-400 focus:outline-none"
-                />
+                <div className="flex w-full">
+                  {/* <label
+                    htmlFor={"prefix" + index + 1}
+                    className="text-lg font-semibold text-slate-800"
+                  >
+                    Prefix:
+                  </label> */}
+                  <input
+                    id={"prefix" + index + 1}
+                    name={"prefix" + index + 1}
+                    type="text"
+                    value={player.prefix}
+                    onChange={(e) =>
+                      handlePlayerChange(playerKey, "prefix", e.target.value)
+                    }
+                    className="border border-gray-300 rounded-md p-2  focus:border-gray-400 focus:outline-none w-1/3 mr-0 rounded-r-none"
+                  />
+                  <input
+                    required
+                    id={"playerName" + index + 1}
+                    name={"playerName" + index + 1}
+                    type="text"
+                    value={player.name}
+                    onChange={(e) =>
+                      handlePlayerChange(playerKey, "name", e.target.value)
+                    }
+                    className="border border-gray-300 rounded-md p-2  focus:border-gray-400 focus:outline-none w-full ml-0 lg:ml-3 rounded-l-none"
+                  />
+                </div>
                 <label
                   htmlFor={"character" + index + 1}
                   className="text-lg font-semibold text-slate-800"
