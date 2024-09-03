@@ -2,7 +2,7 @@ import { useState } from "react";
 import { characterList } from "../../constants";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Search } from "lucide-react";
 
 const Top8Form = ({ onSubmit }) => {
   const [eventName, setEventName] = useState("");
@@ -140,33 +140,41 @@ const Top8Form = ({ onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="flex flex-col w-full p-4">
-        <label
-          htmlFor="eventLink"
-          className="text-lg font-semibold text-slate-700"
-        >
-          Event Link:
-        </label>
-        <p>
-          Format:
-          https://www.start.gg/tournament/genesis-9-1/event/ultimate-singles
-        </p>
-        <input
-          id="eventLink"
-          name="eventLink"
-          type="text"
-          value={eventLink}
-          onChange={(e) => setEventLink(e.target.value)}
-          className="border border-gray-300 rounded-md p-2 focus:border-gray-400 focus:outline-none"
-        />
+    <form onSubmit={handleSubmit} className="space-y-6 flex flex-col">
+      <div className="flex flex-col  w-full p-4">
+        <div className="m-auto w-full flex flex-col px-8 lg:px-16">
+          {/* <label
+            htmlFor="eventLink"
+            className="text-xl font-semibold mx-auto mb-4 text-slate-700"
+          >
+            Event Link:
+          </label> */}
+
+          <input
+            id="eventLink"
+            name="eventLink"
+            placeholder="https://www.start.gg/tournament/genesis-9-1/event/ultimate-singles"
+            type="text"
+            value={eventLink}
+            onChange={(e) => setEventLink(e.target.value)}
+            className="border border-gray-300 rounded-md p-2 focus:border-gray-400 focus:outline-none w-full mx-auto"
+          />
+        </div>
         <button
           type="button"
           onClick={() => fetchEventData(eventLink)}
-          className="mt-6 bg-[#719145] text-white rounded-sm py-2 px-4 hover:bg-[#86a161] focus:border-gray-400"
+          className="
+          bg-gradient-to-tr from-[#719145] to-[#77a536]
+          mt-6 text-white flex flex-row m-auto rounded-2xl py-3 px-4 hover:bg-[#86a161] focus:border-gray-400 space-x-2 shadow-lg"
         >
-          Fetch Event Data
+          <span className="bg-[#2c3441] p-1 sha rounded-full">
+            <Search size={20} />
+          </span>
+          <p className="my-auto font-semibold text-base">Fetch Data</p>
         </button>
+      </div>
+      <div className="mx-auto">
+        {" "}
         {toggle ? (
           <button
             className="bg-gray-30 mx-auto w-fit rounded-2xl my-4 px-4 py-2 hover:bg-gray-40 transition"
@@ -216,7 +224,7 @@ const Top8Form = ({ onSubmit }) => {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="border border-gray-300 rounded-md p-2 focus:border-gray-400 focus:outline-none"
+              className="border border-gray-300 rounded-md p-2 "
             />
           </div>
         </div>
