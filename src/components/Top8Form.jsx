@@ -2,10 +2,18 @@ import { useState } from "react";
 import { characterList } from "../../constants";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { ChevronDown, ChevronUp, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Search,
+  Loader2,
+  CheckCircle,
+} from "lucide-react";
 
 const Top8Form = ({ onSubmit }) => {
   const [eventName, setEventName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [date, setDate] = useState("");
   const [toggle, setToggle] = useState(true);
   const [playerData, setPlayerData] = useState({
@@ -51,6 +59,8 @@ const Top8Form = ({ onSubmit }) => {
 
   const fetchEventData = async (url) => {
     const eventSlug = "tournament/" + extractEventSlug(url);
+    setLoading(true);
+    setSuccess(false);
 
     if (eventSlug) {
       try {
@@ -107,9 +117,12 @@ const Top8Form = ({ onSubmit }) => {
         setDate(""); // Set the date if it's available
         setPlayerData(updatedPlayerData);
         handleToggle();
+        setSuccess(true);
         console.log(updatedPlayerData);
       } catch (error) {
         console.error("Error fetching event data:", error);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -168,7 +181,13 @@ const Top8Form = ({ onSubmit }) => {
           mt-6 text-white flex flex-row m-auto rounded-2xl py-3 px-4 hover:bg-[#86a161] focus:border-gray-400 space-x-2 shadow-lg"
         >
           <span className="bg-[#2c3441] p-1 sha rounded-full">
-            <Search size={20} />
+            {loading ? (
+              <Loader2 size={20} className=" animate-spin" />
+            ) : success && !loading ? (
+              <CheckCircle size={20} />
+            ) : (
+              <Search size={20} />
+            )}
           </span>
           <p className="my-auto font-semibold text-base">Fetch Data</p>
         </button>
