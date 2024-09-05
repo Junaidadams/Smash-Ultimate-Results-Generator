@@ -272,14 +272,14 @@ const Top8Form = ({ onSubmit }) => {
         {" "}
         {toggle ? (
           <button
-            className="bg-gray-30 mx-auto w-fit rounded-2xl my-4 px-4 py-2 hover:bg-gray-40 transition"
+            className="dark:bg-gray-100 mx-auto w-fit rounded-2xl my-4 px-4 py-2 hover:bg-gray-40 transition"
             onClick={() => handleToggle(false)}
           >
             <ChevronUp color="black" />
           </button>
         ) : (
           <button
-            className="bg-gray-30 mx-auto w-fit rounded-2xl my-4 px-4 py-2 hover:bg-gray-40 transition"
+            className="dark:bg-gray-100 mx-auto w-fit rounded-2xl my-4 px-4 py-2 hover:bg-gray-40 transition"
             onClick={() => handleToggle(true)}
           >
             <ChevronDown color="black" />
@@ -291,7 +291,7 @@ const Top8Form = ({ onSubmit }) => {
           <div className="flex flex-col w-full p-4">
             <label
               htmlFor="tournamentName"
-              className="text-lg font-semibold text-slate-700"
+              className="text-lg font-semibold dark:text-slate-100 text-slate-700"
             >
               Tournament Name:
             </label>
@@ -308,7 +308,7 @@ const Top8Form = ({ onSubmit }) => {
           <div className="flex flex-col w-full p-4">
             <label
               htmlFor="eventName"
-              className="text-lg font-semibold text-slate-700"
+              className="text-lg font-semibold dark:text-slate-100 text-slate-700"
             >
               Event Name:
             </label>
@@ -325,7 +325,7 @@ const Top8Form = ({ onSubmit }) => {
           <div className="flex flex-col w-full p-4">
             <label
               htmlFor="date"
-              className="text-lg font-semibold text-slate-700"
+              className="text-lg font-semibold dark:text-slate-100 text-slate-700"
             >
               Date:
             </label>
@@ -351,18 +351,18 @@ const Top8Form = ({ onSubmit }) => {
             return (
               <div
                 key={playerKey}
-                className="flex flex-col space-y-2 bg-[#D4DFC7] shadow-2xl rounded-lg p-6 m-4"
+                className="flex flex-col space-y-2 bg-[#D4DFC7] dark:bg-[#646464] shadow-2xl rounded-lg p-6 m-4"
               >
                 <label
                   htmlFor={"playerName" + index + 1}
-                  className="text-lg font-semibold text-slate-800"
+                  className="text-lg font-semibold text-slate-800 dark:text-slate-100"
                 >
                   Player {index + 1} Name:
                 </label>
                 <div className="flex w-full">
                   {/* <label
                     htmlFor={"prefix" + index + 1}
-                    className="text-lg font-semibold text-slate-800"
+                    className="text-lg font-semibold text-slate-800 dark:text-slate-100"
                   >
                     Prefix:
                   </label> */}
@@ -390,7 +390,7 @@ const Top8Form = ({ onSubmit }) => {
                 </div>
                 <label
                   htmlFor={"character" + index + 1}
-                  className="text-lg font-semibold text-slate-800"
+                  className="text-lg font-semibold text-slate-800 dark:text-slate-100"
                 >
                   Character:
                 </label>
