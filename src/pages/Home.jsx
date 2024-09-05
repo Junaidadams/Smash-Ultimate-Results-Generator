@@ -44,7 +44,9 @@ const Home = () => {
               tournamentName={submittedData.tournamentName}
             />
           ) : (
-            <p className="text-center text-gray-500">No data submitted yet</p>
+            <p className="text-center text-gray-500 dark:text-gray-300">
+              No data submitted yet
+            </p>
           )}
         </div>
       </section>
