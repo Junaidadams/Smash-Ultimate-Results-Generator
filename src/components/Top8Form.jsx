@@ -9,8 +9,10 @@ import {
   Loader2,
   CheckCircle,
 } from "lucide-react";
+import nochar from "../assets/characters/nochar.png";
 
 const Top8Form = ({ onSubmit }) => {
+  const [tournamentName, setTournamentName] = useState("");
   const [eventName, setEventName] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -43,11 +45,68 @@ const Top8Form = ({ onSubmit }) => {
     }));
   };
 
+  const handleAutofill = () => {
+    setPlayerData({
+      player1: {
+        name: "MkLeo",
+        prefix: "T1",
+        placement: "1st",
+        character: 2,
+        skin: 7,
+      },
+      player2: {
+        name: "MuteAce",
+        prefix: "26R",
+        placement: "2nd",
+        character: 4,
+        skin: 3,
+      },
+      player3: {
+        name: "Light",
+        prefix: "Moist",
+        placement: "3rd",
+        character: 3,
+        skin: 0,
+      },
+      player4: {
+        name: "Sonix",
+        prefix: "Bandits FC",
+        placement: "4th",
+        character: 3,
+        skin: 3,
+      },
+      player5: {
+        name: "Sparg0",
+        prefix: "FaZe",
+        placement: "5th",
+        character: 4,
+      },
+      player6: {
+        name: "Glutonny",
+        prefix: "",
+        placement: "5th",
+        character: 16,
+      },
+      player7: {
+        name: "あcola",
+        prefix: "ZETA",
+        placement: "7th",
+        character: 1,
+      },
+      player8: {
+        name: "Tweek",
+        prefix: "TSM",
+        placement: "7th",
+        character: 10,
+      },
+    });
+  };
+
   const getCharacterDetails = (characterKey) => {
     if (characterKey === 0) {
       return {
         icons: [],
-        displayImages: ["../assets/characters/nochar.png"],
+        displayImages: [nochar],
       };
     }
 
@@ -59,6 +118,7 @@ const Top8Form = ({ onSubmit }) => {
 
   const fetchEventData = async (url) => {
     const eventSlug = "tournament/" + extractEventSlug(url);
+    setTournamentName(extractTournamentName(url));
     setLoading(true);
     setSuccess(false);
 
@@ -75,7 +135,7 @@ const Top8Form = ({ onSubmit }) => {
         );
 
         const eventData = response.data.event; // Use 'event' directly as per the combined response structure
-        console.log(eventData);
+
         const { name, standings } = eventData;
 
         if (!standings || !standings.nodes || !Array.isArray(standings.nodes)) {
@@ -134,6 +194,21 @@ const Top8Form = ({ onSubmit }) => {
     return match ? match[1] : null;
   };
 
+  const extractTournamentName = (url) => {
+    const slugPart = url.split("/event")[0];
+
+    const match = slugPart.match(/([a-zA-Z-]+)-(\d+)/);
+
+    if (match) {
+      const tournamentName = match[1].replace(/-/g, " ");
+      const number = match[2]; // "9"
+
+      return `${tournamentName} ${number}`;
+    }
+
+    return null;
+  };
+
   const getPlacementSuffix = (placement) => {
     switch (placement) {
       case 1:
@@ -149,13 +224,14 @@ const Top8Form = ({ onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ eventName, date, playerData });
+    onSubmit({ eventName, date, playerData, tournamentName });
+    console.log(playerData);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 flex flex-col">
       <div className="flex flex-col  w-full p-4">
-        <div className="m-auto w-full flex flex-col px-8 lg:px-16">
+        <div className="m-auto w-full flex flex-col px-8 lg:px-20">
           {/* <label
             htmlFor="eventLink"
             className="text-xl font-semibold mx-auto mb-4 text-slate-700"
@@ -214,10 +290,27 @@ const Top8Form = ({ onSubmit }) => {
         <div className=" flex flex-col 2xl:flex-row">
           <div className="flex flex-col w-full p-4">
             <label
-              htmlFor="eventName"
+              htmlFor="tournamentName"
               className="text-lg font-semibold text-slate-700"
             >
               Tournament Name:
+            </label>
+            <input
+              id="tournamentName"
+              name="tournamentName"
+              type="text"
+              value={tournamentName}
+              onChange={(e) => setTournamentName(e.target.value)}
+              className="border border-gray-300 rounded-md p-2 focus:border-gray-400 focus:outline-none capitalize"
+              required
+            />
+          </div>
+          <div className="flex flex-col w-full p-4">
+            <label
+              htmlFor="eventName"
+              className="text-lg font-semibold text-slate-700"
+            >
+              Event Name:
             </label>
             <input
               id="eventName"
@@ -254,9 +347,7 @@ const Top8Form = ({ onSubmit }) => {
               player.character
             );
             const currentImage =
-              displayImages[player.skin] ||
-              displayImages[0] ||
-              "../assets/characters/nochar.png";
+              displayImages[player.skin] || displayImages[0] || nochar;
             return (
               <div
                 key={playerKey}
@@ -348,12 +439,8 @@ const Top8Form = ({ onSubmit }) => {
                       ))}
                     </div>
                     <img
-                      src={
-                        !currentImage
-                          ? "../assets/characters/nochar.png"
-                          : currentImage
-                      }
-                      alt="Selected Character"
+                      src={!currentImage ? nochar : currentImage}
+                      alt=""
                       className="w-40 h-40 rounded-full mx-auto object-cover mt-2"
                     />
                   </>
@@ -365,9 +452,17 @@ const Top8Form = ({ onSubmit }) => {
         <div className="flex flex-col w-full p-4">
           <button
             type="submit"
-            className="mt-6 bg-[#719145] text-white rounded-sm py-2 px-4 hover:bg-[#86a161] focus:border-gray-400"
+            className="mt-6  bg-gradient-to-tr from-[#719145] to-[#77a536] text-white rounded-sm py-2 px-4 hover:bg-[#86a161] focus:border-gray-400"
           >
             Generate Graphic
+          </button>
+
+          <button
+            onClick={handleAutofill}
+            type="button"
+            className="mt-6  bg-gradient-to-tr from-[#719145] to-[#77a536] text-white rounded-sm py-2 px-4 hover:bg-[#86a161] focus:border-gray-400"
+          >
+            Autofill
           </button>
         </div>
       </div>

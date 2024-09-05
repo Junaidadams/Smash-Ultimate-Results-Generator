@@ -3,18 +3,23 @@ import PropTypes from "prop-types";
 import { toPng } from "html-to-image";
 import { characterList, bgList } from "../../constants";
 
-const Top8Display = ({ eventName, date, playerData }) => {
+const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
   const displayRef = useRef(null);
   const [pngDataUrl, setPngDataUrl] = useState(null);
   const [selectedBackground, setSelectedBackground] = useState(
     bgList[0].Black[0]
   );
+  const [customizationOptions, setCustomizationOptions] = useState({
+    textColor: "#f5f5f5",
+    tileBorderColor: "FFFFFF",
+    tileBGColor: "#FFFFFF",
+  });
 
   useEffect(() => {
     if (displayRef.current && playerData) {
-      console.log("displayRef is populated", displayRef.current);
-      console.log("playerData", playerData);
-      console.log(pngDataUrl);
+      // console.log("displayRef is populated", displayRef.current);
+      // console.log("playerData", playerData);
+      // console.log(pngDataUrl);
 
       const timeoutId = setTimeout(() => {
         toPng(displayRef.current, { pixelRatio: 1 })
@@ -34,7 +39,6 @@ const Top8Display = ({ eventName, date, playerData }) => {
 
   return (
     <div className="flex flex-col items-center w-full h-full">
-      {/* Dropdown for selecting background */}
       <select
         value={selectedBackground}
         onChange={(e) => setSelectedBackground(e.target.value)}
@@ -49,18 +53,22 @@ const Top8Display = ({ eventName, date, playerData }) => {
 
       <div
         ref={displayRef}
-        className={`fixed top-0 left-0 w-[1920px] h-[1080px] p-8 -z-10`}
+        className={`fixed top-0 left-0 w-[1920px] h-[1080px] p-8 -z-10 `}
         style={{
           backgroundImage: `url(${selectedBackground})`,
           backgroundSize: "cover",
+          color: customizationOptions.textColor,
         }}
       >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">{eventName}</h2>
+        <div className="flex  items-center mb-4 max-h-full">
+          <h2 className="text-3xl mr-6 font-semibold capitalize">
+            {tournamentName}
+          </h2>
+          <h2 className="text-2xl font-semibold mr-auto">{eventName}</h2>
           <p className="text-lg">{date}</p>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 h-full">
+        <div className="grid grid-cols-4 gap-2 max-h-full">
           {Object.keys(playerData).map((playerKey) => {
             const player = playerData[playerKey];
             const characterDetails = characterList.find(
@@ -73,7 +81,11 @@ const Top8Display = ({ eventName, date, playerData }) => {
             return (
               <div
                 key={playerKey}
-                className="flex flex-col items-center border-2 border-red-500 rounded-xl p-4"
+                className="flex flex-col items-center border-2 rounded-xl p-4"
+                style={{
+                  border: customizationOptions.tileBorderColor,
+                  backgroundColor: customizationOptions.tileBGColor,
+                }}
               >
                 <h1 className="text-4xl w-fit mr-auto font-semibold">
                   {player.placement}
@@ -84,7 +96,9 @@ const Top8Display = ({ eventName, date, playerData }) => {
                   className="w-72 h-72 object-cover mb-2"
                 />
                 <h3 className="text-3xl font-semibold">
-                  {player.prefix} | {player.name}
+                  {player.prefix
+                    ? `${player.prefix} | ${player.name}`
+                    : `${player.name}`}
                 </h3>
                 <p className="text-lg">{characterDetails?.name}</p>
               </div>
@@ -108,6 +122,7 @@ export default Top8Display;
 
 Top8Display.propTypes = {
   eventName: PropTypes.string.isRequired,
+  tournamentName: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   playerData: PropTypes.objectOf(
     PropTypes.shape({

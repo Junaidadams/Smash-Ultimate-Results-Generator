@@ -16,7 +16,7 @@ const Home = () => {
           <h1 className="text-4xl md:text-5xl text-center p-4 font-extrabold text-[#2c3441]">
             Top 8 Result Generator
           </h1>
-          <p className="p-4 text-base md:text-lg text-[#4B5563] font-medium">
+          <p className="p-4 text-base md:text-lg text-[#4B5563] font-medium text-center">
             Generate sleek and professional Top 8 results for your event.
             <br />
             <br />
@@ -34,6 +34,7 @@ const Home = () => {
               eventName={submittedData.eventName}
               date={submittedData.date}
               playerData={submittedData.playerData}
+              tournamentName={submittedData.tournamentName}
             />
           ) : (
             <p className="text-center text-gray-500">No data submitted yet</p>
