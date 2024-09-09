@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect } from "react";
+import PropTypes from "prop-types";
 import { toPng } from "html-to-image";
 import { characterList, bgList } from "../../constants";
-import ColorPicker from "./ColorPicker"; // Import your ColorPicker component
-import PropTypes from "prop-types";
+import ColorPicker from "./ColorPicker";
 
 const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
   const displayRef = useRef(null);
-  const [toggleColorPicker, setToggleColorPicker] = useState("");
   const [pngDataUrl, setPngDataUrl] = useState(null);
   const [selectedBackground, setSelectedBackground] = useState(
     bgList[0].Black[0]
@@ -16,6 +15,9 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
     tileBorderColor: "#FFFFFF",
     tileBGColor: "#FFFFFF",
   });
+
+  // State to track which color picker is open
+  const [openPicker, setOpenPicker] = useState(null);
 
   useEffect(() => {
     if (displayRef.current && playerData) {
@@ -31,13 +33,19 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [playerData, selectedBackground, customizationOptions]); // Include customizationOptions in dependency array
+  }, [playerData, selectedBackground, customizationOptions]);
 
   const handleColorChange = (key, color) => {
     setCustomizationOptions((prevOptions) => ({
       ...prevOptions,
       [key]: color,
     }));
+  };
+
+  const togglePicker = (pickerName) => {
+    setOpenPicker((prevOpenPicker) =>
+      prevOpenPicker === pickerName ? null : pickerName
+    );
   };
 
   if (!playerData) return null;
@@ -57,21 +65,26 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
       </select>
 
       {/* Color pickers for customization options */}
-      <div className="flex space-x-4 mb-4 flex-col">
+      <div className="flex space-x-4 mb-4">
         <ColorPicker
           label="Text Color"
           color={customizationOptions.textColor}
+          isOpen={openPicker === "textColor"}
+          onToggle={() => togglePicker("textColor")}
           onChange={(color) => handleColorChange("textColor", color)}
-          open={toggleColorPicker}
         />
         <ColorPicker
           label="Tile Border Color"
           color={customizationOptions.tileBorderColor}
+          isOpen={openPicker === "tileBorderColor"}
+          onToggle={() => togglePicker("tileBorderColor")}
           onChange={(color) => handleColorChange("tileBorderColor", color)}
         />
         <ColorPicker
           label="Tile Background Color"
           color={customizationOptions.tileBGColor}
+          isOpen={openPicker === "tileBGColor"}
+          onToggle={() => togglePicker("tileBGColor")}
           onChange={(color) => handleColorChange("tileBGColor", color)}
         />
       </div>
@@ -143,11 +156,8 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
   );
 };
 
-export default Top8Display;
-
 Top8Display.propTypes = {
   eventName: PropTypes.string.isRequired,
-  tournamentName: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   playerData: PropTypes.objectOf(
     PropTypes.shape({
@@ -158,4 +168,7 @@ Top8Display.propTypes = {
       placement: PropTypes.string.isRequired,
     })
   ).isRequired,
+  tournamentName: PropTypes.string.isRequired,
 };
+
+export default Top8Display;

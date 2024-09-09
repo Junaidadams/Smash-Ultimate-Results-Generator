@@ -8,7 +8,6 @@ import {
   Search,
   Loader2,
   CheckCircle,
-  Target,
   Image,
 } from "lucide-react";
 import nochar from "../assets/characters/nochar.png";
@@ -227,7 +226,7 @@ const Top8Form = ({ onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({ eventName, date, playerData, tournamentName });
-    console.log(playerData);
+    // console.log(playerData);
   };
 
   return (
