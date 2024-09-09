@@ -8,6 +8,8 @@ import {
   Search,
   Loader2,
   CheckCircle,
+  Target,
+  Image,
 } from "lucide-react";
 import nochar from "../assets/characters/nochar.png";
 
@@ -452,9 +454,14 @@ const Top8Form = ({ onSubmit }) => {
         <div className="flex flex-col w-full p-4">
           <button
             type="submit"
-            className="mt-6  bg-gradient-to-tr from-[#719145] to-[#77a536] text-white rounded-sm py-2 px-4 hover:bg-[#86a161] focus:border-gray-400"
+            className="
+          bg-gradient-to-tr from-[#719145] to-[#77a536]
+          mt-6 text-white flex flex-row m-auto rounded-2xl py-3 px-4 hover:bg-[#86a161] focus:border-gray-400 space-x-2 shadow-lg"
           >
-            Generate Graphic
+            <span className="bg-[#2c3441] p-1 rounded-full shadow-inherit">
+              <Image />
+            </span>
+            <p className="my-auto font-semibold text-base">Generate</p>
           </button>
 
           <button

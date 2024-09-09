@@ -1,26 +1,24 @@
-import { useRef, useEffect, useState } from "react";
-import PropTypes from "prop-types";
+import { useState, useRef, useEffect } from "react";
 import { toPng } from "html-to-image";
 import { characterList, bgList } from "../../constants";
+import ColorPicker from "./ColorPicker"; // Import your ColorPicker component
+import PropTypes from "prop-types";
 
 const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
   const displayRef = useRef(null);
+  const [toggleColorPicker, setToggleColorPicker] = useState("");
   const [pngDataUrl, setPngDataUrl] = useState(null);
   const [selectedBackground, setSelectedBackground] = useState(
     bgList[0].Black[0]
   );
   const [customizationOptions, setCustomizationOptions] = useState({
     textColor: "#f5f5f5",
-    tileBorderColor: "FFFFFF",
+    tileBorderColor: "#FFFFFF",
     tileBGColor: "#FFFFFF",
   });
 
   useEffect(() => {
     if (displayRef.current && playerData) {
-      // console.log("displayRef is populated", displayRef.current);
-      // console.log("playerData", playerData);
-      // console.log(pngDataUrl);
-
       const timeoutId = setTimeout(() => {
         toPng(displayRef.current, { pixelRatio: 1 })
           .then((dataUrl) => {
@@ -33,7 +31,14 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [playerData]);
+  }, [playerData, selectedBackground, customizationOptions]); // Include customizationOptions in dependency array
+
+  const handleColorChange = (key, color) => {
+    setCustomizationOptions((prevOptions) => ({
+      ...prevOptions,
+      [key]: color,
+    }));
+  };
 
   if (!playerData) return null;
 
@@ -51,6 +56,26 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
         ))}
       </select>
 
+      {/* Color pickers for customization options */}
+      <div className="flex space-x-4 mb-4 flex-col">
+        <ColorPicker
+          label="Text Color"
+          color={customizationOptions.textColor}
+          onChange={(color) => handleColorChange("textColor", color)}
+          open={toggleColorPicker}
+        />
+        <ColorPicker
+          label="Tile Border Color"
+          color={customizationOptions.tileBorderColor}
+          onChange={(color) => handleColorChange("tileBorderColor", color)}
+        />
+        <ColorPicker
+          label="Tile Background Color"
+          color={customizationOptions.tileBGColor}
+          onChange={(color) => handleColorChange("tileBGColor", color)}
+        />
+      </div>
+
       <div
         ref={displayRef}
         className={`fixed top-0 left-0 w-[1920px] h-[1080px] p-8 -z-10 `}
@@ -60,7 +85,7 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
           color: customizationOptions.textColor,
         }}
       >
-        <div className="flex  items-center mb-4 max-h-full">
+        <div className="flex items-center mb-4 max-h-full">
           <h2 className="text-3xl mr-6 font-semibold capitalize">
             {tournamentName}
           </h2>
@@ -83,7 +108,7 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
                 key={playerKey}
                 className="flex flex-col items-center border-2 rounded-xl p-4"
                 style={{
-                  border: customizationOptions.tileBorderColor,
+                  borderColor: customizationOptions.tileBorderColor,
                   backgroundColor: customizationOptions.tileBGColor,
                 }}
               >
