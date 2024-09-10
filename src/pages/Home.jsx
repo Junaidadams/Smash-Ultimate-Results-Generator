@@ -1,6 +1,7 @@
 import Top8Display from "../components/Top8Display";
 import Top8Form from "../components/Top8Form";
 import { useState } from "react";
+import logo from "../assets/logo.png";
 
 const Home = () => {
   const [submittedData, setSubmittedData] = useState(null);
@@ -19,6 +20,9 @@ const Home = () => {
     >
       <section className="w-full dark:bg-[#333] bg-[#fcfcfc] sm:w-2/3 md:w-1/2 2xl:w-3/5 mx-auto min-h-screen sm:min-h-fit shadow-2xl rounded-none sm:rounded-xl overflow-hidden flex flex-col">
         <div className="px-8 pt-8 lg:px-16 flex flex-col mx-auto">
+          <div className="w-fit p-2 bg-[#fcfcfc] rounded-full  mx-auto">
+            <img className="w-16 h-16" src={logo} />
+          </div>
           <h1 className="text-4xl md:text-5xl text-center p-4 font-extrabold text-[#2c3441] dark:text-[rgb(245,245,245)]">
             Top 8 Result Generator
           </h1>

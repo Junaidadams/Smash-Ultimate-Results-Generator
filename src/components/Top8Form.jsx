@@ -41,7 +41,8 @@ const Top8Form = ({ onSubmit }) => {
       ...prevPlayerData,
       [playerKey]: {
         ...prevPlayerData[playerKey],
-        [field]: field === "character" ? Number(value) : value, // Ensure value is a number for character
+        [field]: field === "character" ? Number(value) : value, // Convert character value to a number
+        ...(field === "character" && { skin: 0 }), // Reset skin to 0 if character changes
       },
     }));
   };
@@ -81,24 +82,28 @@ const Top8Form = ({ onSubmit }) => {
         prefix: "FaZe",
         placement: "5th",
         character: 4,
+        skin: 3,
       },
       player6: {
         name: "Glutonny",
         prefix: "",
         placement: "5th",
         character: 16,
+        skin: 3,
       },
       player7: {
         name: "あcola",
         prefix: "ZETA",
         placement: "7th",
         character: 1,
+        skin: 3,
       },
       player8: {
         name: "Tweek",
         prefix: "TSM",
         placement: "7th",
         character: 10,
+        skin: 3,
       },
     });
   };
@@ -179,7 +184,7 @@ const Top8Form = ({ onSubmit }) => {
         setPlayerData(updatedPlayerData);
         handleToggle();
         setSuccess(true);
-        console.log(updatedPlayerData);
+        // console.log(updatedPlayerData);
       } catch (error) {
         console.error("Error fetching event data:", error);
       } finally {
@@ -233,13 +238,6 @@ const Top8Form = ({ onSubmit }) => {
     <form onSubmit={handleSubmit} className="space-y-6 flex flex-col">
       <div className="flex flex-col  w-full p-4">
         <div className="m-auto w-full flex flex-col px-8 lg:px-20">
-          {/* <label
-            htmlFor="eventLink"
-            className="text-xl font-semibold mx-auto mb-4 text-slate-700"
-          >
-            Event Link:
-          </label> */}
-
           <input
             id="eventLink"
             name="eventLink"
@@ -347,8 +345,7 @@ const Top8Form = ({ onSubmit }) => {
             const { icons, displayImages } = getCharacterDetails(
               player.character
             );
-            const currentImage =
-              displayImages[player.skin] || displayImages[0] || nochar;
+            const currentImage = displayImages[player.skin] || displayImages[0];
             return (
               <div
                 key={playerKey}
