@@ -255,7 +255,7 @@ const Top8Form = ({ onSubmit }) => {
           bg-gradient-to-tr from-[#719145] to-[#77a536]
           mt-6 text-white flex flex-row m-auto rounded-2xl py-3 px-4 hover:bg-[#86a161] focus:border-gray-400 space-x-2 shadow-lg"
         >
-          <span className="bg-[#2c3441] p-1 sha rounded-full">
+          <span className="bg-[#2c3441] p-1 rounded-full">
             {loading ? (
               <Loader2 size={20} className=" animate-spin" />
             ) : success && !loading ? (

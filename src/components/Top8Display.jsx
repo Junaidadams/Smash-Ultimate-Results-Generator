@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { toPng } from "html-to-image";
-import { characterList, bgList } from "../../constants";
+import { bgList } from "../../constants";
 import ColorPicker from "./ColorPicker";
 
 const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
@@ -12,8 +12,8 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
   );
   const [customizationOptions, setCustomizationOptions] = useState({
     textColor: "#f5f5f5",
-    tileBorderColor: "#FFFFFF",
-    tileBGColor: "#FFFFFF",
+    tileBorderColor: "#f5f5f5",
+    tileBGColor: "#f5f5f5",
   });
 
   // State to track which color picker is open
@@ -91,7 +91,7 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
 
       <div
         ref={displayRef}
-        className={`fixed top-0 left-0 w-[1920px] h-[1080px] p-8 -z-10 `}
+        className={`fixed top-0 left-0 w-[1920px] h-[1080px] p-8 -z-10 flex flex-col`}
         style={{
           backgroundImage: `url(${selectedBackground})`,
           backgroundSize: "cover",
@@ -99,49 +99,30 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
         }}
       >
         <div className="flex items-center mb-4 max-h-full">
-          <h2 className="text-3xl mr-6 font-semibold capitalize">
-            {tournamentName}
-          </h2>
-          <h2 className="text-2xl font-semibold mr-auto">{eventName}</h2>
-          <p className="text-lg">{date}</p>
+          <div>
+            <h2 className="text-5xl mr-6 font-semibold capitalize">
+              {tournamentName}
+            </h2>
+            <h2 className="text-4xl font-semibold mr-auto">{eventName}</h2>
+          </div>
+          <p className="text-4xl ml-auto">{date}</p>
         </div>
 
-        <div className="grid grid-cols-4 gap-2 max-h-full">
-          {Object.keys(playerData).map((playerKey) => {
-            const player = playerData[playerKey];
-            const characterDetails = characterList.find(
-              (character) => character.key === Number(player.character)
-            );
-            const currentImage =
-              characterDetails?.images[0].displayImages[player.skin] ||
-              characterDetails?.images[0].displayImages[0];
-
-            return (
-              <div
-                key={playerKey}
-                className="flex flex-col items-center border-2 rounded-xl p-4"
-                style={{
-                  borderColor: customizationOptions.tileBorderColor,
-                  backgroundColor: customizationOptions.tileBGColor,
-                }}
-              >
-                <h1 className="text-4xl w-fit mr-auto font-semibold">
-                  {player.placement}
-                </h1>
-                <img
-                  src={currentImage}
-                  alt={characterDetails?.name || "Character"}
-                  className="w-72 h-72 object-cover mb-2"
-                />
-                <h3 className="text-3xl font-semibold">
-                  {player.prefix
-                    ? `${player.prefix} | ${player.name}`
-                    : `${player.name}`}
-                </h3>
-                <p className="text-lg">{characterDetails?.name}</p>
-              </div>
-            );
-          })}
+        <div className="bg-white w-full h-2/3 m-auto p-4 flex flex-row space-x-4 ">
+          <div className="flex w-[35%] h-full bg-blue-500"></div>
+          <div className="flex flex-col w-[65%]  space-y-4">
+            <div className="flex  flex-row justify-between space-x-4 w-full h-[55%]">
+              <div className="w-1/3">Content 2</div>
+              <div className="w-1/3">Content 3</div>
+              <div className="w-1/3">Content 4</div>
+            </div>
+            <div className="flex flex-row justify-between h-[45%] space-x-4 ">
+              <div className="w-1/4">Content 5</div>
+              <div className="w-1/4">Content 6</div>
+              <div className="w-1/4">Content 7</div>
+              <div className="w-1/4">Content 8</div>
+            </div>
+          </div>
         </div>
       </div>
 
