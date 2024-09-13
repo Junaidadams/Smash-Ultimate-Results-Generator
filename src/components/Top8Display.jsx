@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { toPng } from "html-to-image";
-import { bgList } from "../../constants";
+import { bgList, characterList } from "../../constants";
 import ColorPicker from "./ColorPicker";
 
 const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
@@ -42,6 +42,25 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
     }));
   };
 
+  const findImage = (characterKey, skinKey) => {
+    // Find the character by key (make sure the key is matched properly)
+    const characterDetails = characterList.find(
+      (character) => character.key === Number(characterKey)
+    );
+
+    if (!characterDetails) {
+      // Handle case when character is not found
+      return null;
+    }
+
+    // Access the first image object in images array and then the displayImages array
+    const displayImage =
+      characterDetails?.images?.[0]?.displayImages?.[skinKey] ||
+      characterDetails?.images?.[0]?.displayImages?.[0]; // Fallback to default image if skinKey not found
+
+    return displayImage || null; // Return null if no image is found
+  };
+
   const togglePicker = (pickerName) => {
     setOpenPicker((prevOpenPicker) =>
       prevOpenPicker === pickerName ? null : pickerName
@@ -49,6 +68,15 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
   };
 
   if (!playerData) return null;
+
+  const player1 = playerData.player1;
+  const player2 = playerData.player2;
+  const player3 = playerData.player3;
+  const player4 = playerData.player4;
+  const player5 = playerData.player5;
+  const player6 = playerData.player6;
+  const player7 = playerData.player7;
+  const player8 = playerData.player8;
 
   return (
     <div className="flex flex-col items-center w-full h-full">
@@ -109,15 +137,137 @@ const Top8Display = ({ eventName, date, playerData, tournamentName }) => {
         </div>
 
         <div className="bg-white w-full h-2/3 m-auto p-4 flex flex-row space-x-4 ">
-          <div className="flex w-[35%] h-full bg-blue-500"></div>
-          <div className="flex flex-col w-[65%]  space-y-4">
-            <div className="flex  flex-row justify-between space-x-4 w-full h-[55%]">
-              <div className="w-1/3">Content 2</div>
-              <div className="w-1/3">Content 3</div>
-              <div className="w-1/3">Content 4</div>
+          {/* FIRST PLACE DIV */}
+          <div className="flex w-[35%] h-full bg-blue-500 flex-col">
+            <div className="ml-auto">
+              <h1 className="ml-auto font-semibold text-5xl mt-3 mr-4">
+                {playerData.player1.placement}
+              </h1>
             </div>
-            <div className="flex flex-row justify-between h-[45%] space-x-4 ">
-              <div className="w-1/4">Content 5</div>
+            <div>
+              <img
+                src={findImage(player1.character, player1.skin)}
+                alt={
+                  characterList.find(
+                    (character) => character.key === Number(player1.character)
+                  )?.name || "Character"
+                }
+                className=" object-cover m-auto"
+              />
+            </div>
+            <div className="mx-auto">
+              <h1 className=" font-semibold text-5xl mt-3 mr-4">
+                {player1.prefix ? `${player1.prefix} |` : ""} {player1.name}
+              </h1>
+            </div>
+          </div>
+          {/* END OF PLACE DIV */}
+          <div className="flex flex-col w-[65%] space-y-4">
+            <div className="flex flex-row justify-between space-x-4 w-full h-[55%]">
+              {/* START OF 2ND PLACE DIV */}
+              <div className="w-1/3 h-full bg-red-300 flex flex-col justify-between items-center">
+                <div className="ml-auto">
+                  <h1 className="ml-auto font-bold text-4xl mt-3 mr-4">
+                    {playerData.player2.placement}
+                  </h1>
+                </div>
+                <div className="flex justify-center items-center h-[60%] overflow-hidden">
+                  <img
+                    src={findImage(player2.character, player2.skin)}
+                    alt={
+                      characterList.find(
+                        (character) =>
+                          character.key === Number(player2.character)
+                      )?.name || "Character"
+                    }
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="mx-auto">
+                  <h1 className="font-semibold text-4xl my-3 mr-4 text-center">
+                    {player2.prefix ? `${player2.prefix} |` : ""} {player2.name}
+                  </h1>
+                </div>
+              </div>
+              {/* END OF 2ND PLACE DIV */}
+              {/* START OF 3RD PLACE DIV */}
+              <div className="w-1/3 h-full bg-red-300 flex flex-col justify-between items-center">
+                <div className="ml-auto">
+                  <h1 className="ml-auto font-bold text-4xl mt-3 mr-4">
+                    {playerData.player3.placement}
+                  </h1>
+                </div>
+                <div className="flex justify-center items-center h-[60%] overflow-hidden">
+                  <img
+                    src={findImage(player3.character, player3.skin)}
+                    alt={
+                      characterList.find(
+                        (character) =>
+                          character.key === Number(player3.character)
+                      )?.name || "Character"
+                    }
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="mx-auto">
+                  <h1 className="font-semibold text-4xl my-3 mr-4 text-center">
+                    {player3.prefix ? `${player3.prefix} |` : ""} {player3.name}
+                  </h1>
+                </div>
+              </div>{" "}
+              {/* END OF 3RD PLACE DIV */}
+              {/* START OF 3RD PLACE DIV */}
+              <div className="w-1/3 h-full bg-red-300 flex flex-col justify-between items-center">
+                <div className="ml-auto">
+                  <h1 className="ml-auto font-bold text-4xl mt-3 mr-4">
+                    {playerData.player4.placement}
+                  </h1>
+                </div>
+                <div className="flex justify-center items-center h-[60%] overflow-hidden">
+                  <img
+                    src={findImage(player4.character, player4.skin)}
+                    alt={
+                      characterList.find(
+                        (character) =>
+                          character.key === Number(player4.character)
+                      )?.name || "Character"
+                    }
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="mx-auto">
+                  <h1 className="font-semibold text-4xl my-3 mr-4 text-center">
+                    {player4.prefix ? `${player4.prefix} |` : ""} {player4.name}
+                  </h1>
+                </div>
+              </div>
+              {/* END OF 4TH PLACE DIV */}
+            </div>
+            <div className="flex flex-row justify-between space-x-4 w-full h-[42%]">
+              <div className="w-1/4 h-full bg-red-300 flex flex-col justify-between items-center">
+                <div className="ml-auto">
+                  <h1 className="ml-auto font-bold text-4xl mt-3 mr-4">
+                    {playerData.player4.placement}
+                  </h1>
+                </div>
+                <div className="flex justify-center items-center h-[60%] overflow-hidden">
+                  <img
+                    src={findImage(player4.character, player4.skin)}
+                    alt={
+                      characterList.find(
+                        (character) =>
+                          character.key === Number(player4.character)
+                      )?.name || "Character"
+                    }
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="mx-auto">
+                  <h1 className="font-semibold text-4xl my-3 mr-4 text-center">
+                    {player4.prefix ? `${player4.prefix} |` : ""} {player4.name}
+                  </h1>
+                </div>
+              </div>
               <div className="w-1/4">Content 6</div>
               <div className="w-1/4">Content 7</div>
               <div className="w-1/4">Content 8</div>

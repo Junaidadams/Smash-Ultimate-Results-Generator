@@ -358,12 +358,6 @@ const Top8Form = ({ onSubmit }) => {
                   Player {index + 1} Name:
                 </label>
                 <div className="flex w-full">
-                  {/* <label
-                    htmlFor={"prefix" + index + 1}
-                    className="text-lg font-semibold text-slate-800 dark:text-slate-100"
-                  >
-                    Prefix:
-                  </label> */}
                   <input
                     id={"prefix" + index + 1}
                     name={"prefix" + index + 1}
